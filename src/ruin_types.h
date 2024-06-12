@@ -23,12 +23,20 @@ typedef enum {
 #define RUIN_SDL_Error(error_message) fprintf(stderr, error_message, SDL_GetError());
 #define RUIN_SDL_ErrorReturn(error_message, return_value) fprintf(stderr, error_message, SDL_GetError()); return return_value;
 
+/* bitset operations */
+#define bitset(byte,nbit)   ((byte) |=  (1<<(nbit)))
+#define bitclear(byte,nbit) ((byte) &= ~(1<<(nbit)))
+#define bitflip(byte,nbit)  ((byte) ^=  (1<<(nbit)))
+#define bitcheck(byte,nbit) ((byte) &   (1<<(nbit)))
+
 /* Basic data types */
+typedef unsigned char ubyte;
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 typedef unsigned long long u64;
 
+typedef char byte;
 typedef char i8;
 typedef short i16;
 typedef int i32;

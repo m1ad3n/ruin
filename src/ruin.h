@@ -8,39 +8,52 @@
 
 /* standard input output */
 #include "ruin_types.h"
-#include "cvec/cvec.h"
+
+#define MAX_SPRITES 10
+#define MAX_FRAMES  10
+#define MAX_ENTITYS 10
+
+enum RUIN_SPRITE_FLAGS {
+	SPRITE_TOGGLE	= 0x1,
+};
 
 typedef struct {
 
-	SDL_Texture* texture;
-	cvec* rects;
 	u8 frames;
+	u16 update_time;
+	u16 wait_time;
+
+	SDL_Texture* texture;
+	SDL_Rect rects[MAX_FRAMES];
+	byte pref;
 
 } RUIN_Sprite;
 
-RUIN_Sprite* RUIN_CreateSprite(char* _path, u8 _frames, SDL_Renderer* _renderer);
-SDL_Rect* RUIN_SpriteRequestFrame(RUIN_Sprite* _sprite, u8 _frame);
+RUIN_Sprite* RUIN_CreateSprite(char* _path, u8 _frames, SDL_Renderer* _renderer, byte _toggle, u16 _update_time, u16 _wait_time);
+SDL_Rect RUIN_SpriteRequestFrame(RUIN_Sprite* _sprite, u8 _frame);
 RUIN_STATUS_CODE RUIN_DestroySprite(RUIN_Sprite* _sprite);
 
-typedef enum {
-
-	RUIN_PLAYER,
-	RUIN_ENEMY,
-
-} RUIN_ENTITY_TYPES;
+enum RUIN_ENTITY_FLAGS {
+	ENTITY_FLIP,
+};
 
 typedef struct {
 
 	SDL_Rect dest_rect;
 	u8 active_sprite;
 	u8 frame;
-	cvec* sprites;
 	u64 last_render_time;
+
+	RUIN_Sprite* sprites[MAX_SPRITES];
+	u8 sprite_count;
+
+	byte pref;
 
 } RUIN_Entity;
 
-RUIN_Entity* RUIN_CreateEntity(i32 _x, i32 _y, cvec* _sprites);
+RUIN_Entity* RUIN_CreateEntity(i32 _x, i32 _y, RUIN_Sprite* _sprite);
 RUIN_STATUS_CODE RUIN_RenderEntity(RUIN_Entity* _entity, SDL_Renderer* _renderer);
+RUIN_STATUS_CODE RUIN_EntityAddSprite(RUIN_Entity* _entity, RUIN_Sprite* _sprite);
 u8 RUIN_EntityCurrentSpriteFrames(RUIN_Entity* _entity);
 RUIN_STATUS_CODE RUIN_DestroyEntity(RUIN_Entity* _entity);
 
@@ -56,13 +69,14 @@ typedef struct {
 	RUIN_String* TITLE;
 	RUIN_Bool running;
 
-	cvec* entitys;
+	RUIN_Entity* entitys[MAX_ENTITYS];
+	u8 entity_count;
 
 } RUIN_Game;
 
-RUIN_Game* RUIN_InitGame(char* __title);
-RUIN_STATUS_CODE RUIN_StartGame(RUIN_Game* __game);
-RUIN_STATUS_CODE RUIN_GameAddEntity(RUIN_Game* __game, i32 _x, i32 _y, char* _path, u8 _frames);
-RUIN_STATUS_CODE RUIN_ExitGame(RUIN_Game* __game);
+RUIN_Game* RUIN_InitGame(char* _title);
+RUIN_STATUS_CODE RUIN_StartGame(RUIN_Game* _game);
+RUIN_STATUS_CODE RUIN_GameAddEntity(RUIN_Game* _game, RUIN_Entity* _entity);
+RUIN_STATUS_CODE RUIN_ExitGame(RUIN_Game* _game);
 
 #endif // RUIN_HEADER
